@@ -17,12 +17,7 @@ interface ClaudeResultEnvelope {
  * `claude -p`를 헤드리스로 실행한다. Pro 구독 인증을 사용하며 API 키를 쓰지 않는다.
  * Read 툴만 허용해 로컬 이미지(vision 분석용 리사이즈 사본)를 읽되, 그 외 파일시스템/Bash 접근은 막는다.
  */
-export async function runClaude(promptText: string): Promise<string> {
-  if (process.env.ANTHROPIC_API_KEY) {
-    // plan §2: ANTHROPIC_API_KEY가 있으면 claude -p가 구독 대신 API 과금으로 동작한다.
-    // 여기서 막지는 않되(사용자가 의도적으로 API 키를 쓸 수도 있음) 상위 API status 체크에서 경고한다.
-  }
-
+export async function runClaude(promptText: string, signal?: AbortSignal): Promise<string> {
   let stdout: string;
   try {
     const result = await execFileAsync(
@@ -37,7 +32,7 @@ export async function runClaude(promptText: string): Promise<string> {
         "--permission-mode",
         "bypassPermissions",
       ],
-      { timeout: CLAUDE_TIMEOUT_MS, maxBuffer: 1024 * 1024 * 64 }
+      { timeout: CLAUDE_TIMEOUT_MS, maxBuffer: 1024 * 1024 * 64, signal }
     );
     stdout = result.stdout;
   } catch (err) {
@@ -75,9 +70,9 @@ function extractJson(text: string): unknown {
 /**
  * 프롬프트를 실행해 초안 JSON을 생성한다. 스키마 검증 실패 시 1회 자동 재시도한다 (plan §4).
  */
-export async function generateDraft(promptText: string): Promise<Draft> {
+export async function generateDraft(promptText: string, signal?: AbortSignal): Promise<Draft> {
   const attempt = async (prompt: string): Promise<Draft> => {
-    const raw = await runClaude(prompt);
+    const raw = await runClaude(prompt, signal);
     const parsed = extractJson(raw);
     return draftSchema.parse(parsed);
   };

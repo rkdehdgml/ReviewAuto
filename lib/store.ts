@@ -5,6 +5,7 @@ import path from "node:path";
 import {
   type Draft,
   type HistoryEntry,
+  type InputPhoto,
   type JobStatus,
   type StyleProfile,
   styleProfileSchema,
@@ -14,6 +15,7 @@ const DATA_DIR = path.join(process.cwd(), "data");
 const HISTORY_DIR = path.join(DATA_DIR, "history");
 const STYLE_PROFILE_PATH = path.join(DATA_DIR, "style-profile.json");
 const JOB_STATUS_PATH = path.join(DATA_DIR, "job-status.json");
+const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 
 async function ensureDir(dir: string) {
   await fs.mkdir(dir, { recursive: true });
@@ -104,4 +106,22 @@ export async function loadDraft(id: string): Promise<Draft | null> {
   return readJsonIfExists<Draft>(draftFilePath(id));
 }
 
-export { DATA_DIR, HISTORY_DIR, STYLE_PROFILE_PATH };
+// ── 업로드된 원본 사진 (generate → review → upload-draft 전 구간에서 재사용) ────
+
+export function uploadDir(draftId: string): string {
+  return path.join(UPLOADS_DIR, draftId);
+}
+
+function photoManifestPath(draftId: string): string {
+  return path.join(uploadDir(draftId), "manifest.json");
+}
+
+export async function savePhotoManifest(draftId: string, photos: InputPhoto[]): Promise<void> {
+  await writeJsonAtomic(photoManifestPath(draftId), photos);
+}
+
+export async function loadPhotoManifest(draftId: string): Promise<InputPhoto[] | null> {
+  return readJsonIfExists<InputPhoto[]>(photoManifestPath(draftId));
+}
+
+export { DATA_DIR, HISTORY_DIR, STYLE_PROFILE_PATH, UPLOADS_DIR };
