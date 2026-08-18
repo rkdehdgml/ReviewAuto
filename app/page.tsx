@@ -17,6 +17,10 @@ type PlaceSearchState =
   | { kind: "empty" }
   | { kind: "failed" };
 
+const inputClass =
+  "rounded border border-hairline bg-surface px-3 py-2 text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-accent";
+const labelClass = "text-sm font-medium text-ink-soft";
+
 export default function InputPage() {
   const router = useRouter();
   const { input, setInput, place, setPlace, photos, setPhotos, setGenerateResult } = useSession();
@@ -141,18 +145,18 @@ export default function InputPage() {
       <StepRail current="input" />
       <LoadingOverlay visible={loading} stageText={stageText} onCancel={handleCancel} />
 
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 py-8">
-        <h1 className="text-xl font-semibold">체험단 리뷰 초안 생성</h1>
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-7 px-6 py-10">
+        <h1 className="font-display text-2xl text-ink">체험단 리뷰 초안 생성</h1>
 
         {error && (
-          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+          <div className="rounded border border-danger/25 bg-danger-soft px-4 py-3 text-sm text-danger">{error}</div>
         )}
 
         <div className="grid grid-cols-2 gap-4">
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-neutral-700">업체명</span>
+          <label className="flex flex-col gap-1.5">
+            <span className={labelClass}>업체명</span>
             <input
-              className="rounded-md border border-neutral-300 px-3 py-2"
+              className={inputClass}
               value={input.businessName}
               onChange={(e) => {
                 setInput({ ...input, businessName: e.target.value });
@@ -161,10 +165,10 @@ export default function InputPage() {
               placeholder="예: 카페 리뷰오토"
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-neutral-700">위치</span>
+          <label className="flex flex-col gap-1.5">
+            <span className={labelClass}>위치</span>
             <input
-              className="rounded-md border border-neutral-300 px-3 py-2"
+              className={inputClass}
               value={input.location}
               onChange={(e) => {
                 setInput({ ...input, location: e.target.value });
@@ -175,58 +179,57 @@ export default function InputPage() {
           </label>
         </div>
 
-        <div className="rounded-md border border-neutral-200 p-3">
-          {!hasBusinessName && (
-            <p className="text-sm text-neutral-400">업체명을 입력하면 자동으로 검색됩니다.</p>
-          )}
+        <div className="rounded border border-hairline bg-surface p-3.5">
+          {!hasBusinessName && <p className="text-sm text-ink-faint">업체명을 입력하면 자동으로 검색됩니다.</p>}
           {hasBusinessName && searchState.kind === "searching" && (
-            <p className="flex items-center gap-2 text-sm text-neutral-500">
-              <span className="h-3 w-3 animate-spin rounded-full border-2 border-neutral-300 border-t-neutral-600" />
+            <p className="flex items-center gap-2 text-sm text-ink-soft">
+              <span className="h-3 w-3 animate-spin rounded-full border-2 border-hairline-strong border-t-accent" />
               검색중...
             </p>
           )}
           {hasBusinessName && searchState.kind === "results" && (
             <ul className="flex flex-col gap-2">
-              {searchState.results.map((r, i) => (
-                <li key={i}>
-                  <button
-                    type="button"
-                    onClick={() => setPlace(r)}
-                    className={`w-full rounded-md border px-3 py-2 text-left text-sm ${
-                      place?.name === r.name && place?.address === r.address
-                        ? "border-neutral-900 bg-neutral-900 text-white"
-                        : "border-neutral-200 hover:bg-neutral-50"
-                    }`}
-                  >
-                    <div className="font-medium">{r.name}</div>
-                    <div className="text-xs opacity-70">
-                      {[r.category, r.roadAddress ?? r.address].filter(Boolean).join(" · ")}
-                    </div>
-                  </button>
-                </li>
-              ))}
+              {searchState.results.map((r, i) => {
+                const selected = place?.name === r.name && place?.address === r.address;
+                return (
+                  <li key={i}>
+                    <button
+                      type="button"
+                      onClick={() => setPlace(r)}
+                      className={`w-full rounded border px-3 py-2 text-left text-sm transition-colors ${
+                        selected
+                          ? "border-accent bg-accent text-white"
+                          : "border-hairline hover:border-hairline-strong hover:bg-paper"
+                      }`}
+                    >
+                      <div className="font-medium">{r.name}</div>
+                      <div className={`text-xs ${selected ? "text-white/75" : "text-ink-faint"}`}>
+                        {[r.category, r.roadAddress ?? r.address].filter(Boolean).join(" · ")}
+                      </div>
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           )}
           {hasBusinessName && (searchState.kind === "empty" || searchState.kind === "failed") && (
-            <div className="flex items-center justify-between text-sm text-neutral-500">
+            <div className="flex items-center justify-between text-sm text-ink-soft">
               <span>
                 {searchState.kind === "failed" ? "검색에 실패했습니다." : "검색 결과가 없습니다."} 가게 정보 없이
                 진행할 수 있습니다.
               </span>
-              <button type="button" className="text-neutral-700 underline" onClick={runPlaceSearch}>
+              <button type="button" className="text-ink underline decoration-hairline-strong" onClick={runPlaceSearch}>
                 다시 검색
               </button>
             </div>
           )}
-          {place && (
-            <p className="mt-2 text-xs text-emerald-600">선택됨: {place.name}</p>
-          )}
+          {place && <p className="mt-2 text-xs text-success">선택됨 · {place.name}</p>}
         </div>
 
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-neutral-700">가이드라인 원문</span>
+        <label className="flex flex-col gap-1.5">
+          <span className={labelClass}>가이드라인 원문</span>
           <textarea
-            className="min-h-32 rounded-md border border-neutral-300 px-3 py-2"
+            className={`${inputClass} min-h-32`}
             value={input.guideline}
             onChange={(e) => setInput({ ...input, guideline: e.target.value })}
             placeholder="체험단 가이드라인을 그대로 붙여넣으세요."
@@ -234,7 +237,7 @@ export default function InputPage() {
         </label>
 
         <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-neutral-700">사진</span>
+          <span className={labelClass}>사진</span>
           <div
             onDragOver={(e) => {
               e.preventDefault();
@@ -246,13 +249,13 @@ export default function InputPage() {
               setIsDragging(false);
               addPhotos(e.dataTransfer.files);
             }}
-            className={`rounded-md border-2 border-dashed px-4 py-6 text-center text-sm ${
-              isDragging ? "border-neutral-900 bg-neutral-50" : "border-neutral-300 text-neutral-400"
+            className={`rounded border-2 border-dashed px-4 py-7 text-center text-sm transition-colors ${
+              isDragging ? "border-accent bg-accent-soft text-ink" : "border-hairline-strong text-ink-faint"
             }`}
           >
             사진을 이곳에 끌어다 놓으세요
             <div className="mt-2">
-              <label className="cursor-pointer text-neutral-700 underline">
+              <label className="cursor-pointer text-ink underline decoration-hairline-strong">
                 파일 선택
                 <input
                   type="file"
@@ -268,31 +271,30 @@ export default function InputPage() {
           {photos.length > 0 && (
             <ul className="flex flex-col gap-2">
               {photos.map((p, i) => (
-                <li key={`${p.file.name}-${i}`} className="flex items-center gap-3 rounded-md border border-neutral-200 p-2">
+                <li
+                  key={`${p.file.name}-${i}`}
+                  className="flex items-center gap-3 rounded border border-hairline bg-surface p-2"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={getObjectUrl(p.file)}
-                    alt={p.file.name}
-                    className="h-14 w-14 rounded object-cover"
-                  />
+                  <img src={getObjectUrl(p.file)} alt={p.file.name} className="h-14 w-14 rounded object-cover" />
                   <div className="flex-1">
-                    <p className="text-xs text-neutral-500">{p.file.name}</p>
+                    <p className="text-xs text-ink-faint">{p.file.name}</p>
                     <input
-                      className="mt-1 w-full rounded border border-neutral-200 px-2 py-1 text-sm"
+                      className="mt-1 w-full rounded border border-hairline bg-surface px-2 py-1 text-sm outline-none placeholder:text-ink-faint focus:border-accent"
                       placeholder="한 줄 설명 (선택)"
                       value={p.description}
                       onChange={(e) => updateDescription(i, e.target.value)}
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <button type="button" onClick={() => movePhoto(i, -1)} className="text-xs text-neutral-500">
+                    <button type="button" onClick={() => movePhoto(i, -1)} className="text-xs text-ink-faint hover:text-ink">
                       ↑
                     </button>
-                    <button type="button" onClick={() => movePhoto(i, 1)} className="text-xs text-neutral-500">
+                    <button type="button" onClick={() => movePhoto(i, 1)} className="text-xs text-ink-faint hover:text-ink">
                       ↓
                     </button>
                   </div>
-                  <button type="button" onClick={() => removePhoto(i)} className="text-neutral-400 hover:text-red-500">
+                  <button type="button" onClick={() => removePhoto(i)} className="text-ink-faint hover:text-danger">
                     ×
                   </button>
                 </li>
@@ -301,10 +303,10 @@ export default function InputPage() {
           )}
         </div>
 
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-neutral-700">메모 (선택)</span>
+        <label className="flex flex-col gap-1.5">
+          <span className={labelClass}>메모 (선택)</span>
           <textarea
-            className="min-h-20 rounded-md border border-neutral-300 px-3 py-2"
+            className={`${inputClass} min-h-20`}
             value={input.memo}
             onChange={(e) => setInput({ ...input, memo: e.target.value })}
           />
@@ -314,7 +316,7 @@ export default function InputPage() {
           type="button"
           onClick={handleSubmit}
           disabled={loading}
-          className="rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-neutral-800 disabled:opacity-50"
+          className="self-start rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
         >
           초안 생성
         </button>

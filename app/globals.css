@@ -1,26 +1,34 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * 디자인 토큰. 이 앱은 개인용 로컬 도구라 시스템 다크모드는 따르지 않고
+ * 하나의 톤(종이 위 잉크)으로 고정한다 — 이전에 body{}가 언레이어드 CSS로
+ * Tailwind 유틸리티(bg-neutral-50 등)를 항상 덮어써 다크모드에서 화면이
+ * 반쪽만 검게 보이던 버그의 근본 원인이었다.
+ */
+@theme {
+  --color-paper: #faf9f6;
+  --color-surface: #ffffff;
+  --color-ink: #1c1a17;
+  --color-ink-soft: #4a453e;
+  --color-ink-faint: #918b7f;
+  --color-hairline: #e6e2d9;
+  --color-hairline-strong: #d3cdc0;
+  --color-accent: #24344a;
+  --color-accent-hover: #182636;
+  --color-accent-soft: #eef1f5;
+  --color-success: #3f6b4f;
+  --color-success-soft: #eaf2ec;
+  --color-danger: #a3402e;
+  --color-danger-soft: #fbeeea;
+  --color-warning: #93691f;
+  --color-warning-soft: #faf1de;
+
+  --font-display: var(--font-gowun), serif;
+  --font-sans: var(--font-geist-sans), "Apple SD Gothic Neo", sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+html {
+  height: 100%;
 }

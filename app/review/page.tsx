@@ -49,12 +49,12 @@ export default function ReviewPage() {
     <div className="flex min-h-screen flex-col">
       <StepRail current="review" />
 
-      <main className="mx-auto grid w-full max-w-5xl flex-1 grid-cols-[1fr_280px] gap-6 px-6 py-8">
+      <main className="mx-auto grid w-full max-w-5xl flex-1 grid-cols-[1fr_280px] gap-8 px-6 py-10">
         <div className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-neutral-700">제목</span>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-sm font-medium text-ink-soft">제목</span>
             <input
-              className="rounded-md border border-neutral-300 px-3 py-2 font-medium"
+              className="rounded border border-hairline bg-surface px-3 py-2 font-display text-lg text-ink outline-none focus:border-accent"
               value={draft.title}
               onChange={(e) => updateDraft({ ...draft, title: e.target.value })}
             />
@@ -62,16 +62,16 @@ export default function ReviewPage() {
 
           <ul className="flex flex-col gap-3">
             {draft.blocks.map((block, i) => (
-              <li key={i} className="rounded-md border border-neutral-200 p-3">
+              <li key={i} className="rounded border border-hairline bg-surface p-3">
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-medium text-neutral-400">
-                    {block.type === "text" ? "텍스트" : "사진"} #{i + 1}
+                  <span className="font-mono text-[11px] tracking-wide text-ink-faint">
+                    {block.type === "text" ? "TEXT" : "IMAGE"} · {String(i + 1).padStart(2, "0")}
                   </span>
-                  <div className="flex gap-2 text-xs text-neutral-500">
-                    <button type="button" onClick={() => moveBlock(i, -1)}>
+                  <div className="flex gap-2 text-xs text-ink-faint">
+                    <button type="button" onClick={() => moveBlock(i, -1)} className="hover:text-ink">
                       ↑
                     </button>
-                    <button type="button" onClick={() => moveBlock(i, 1)}>
+                    <button type="button" onClick={() => moveBlock(i, 1)} className="hover:text-ink">
                       ↓
                     </button>
                   </div>
@@ -79,7 +79,7 @@ export default function ReviewPage() {
 
                 {block.type === "text" ? (
                   <textarea
-                    className="min-h-24 w-full rounded border border-neutral-200 px-2 py-1.5 text-sm"
+                    className="min-h-24 w-full rounded border border-hairline bg-paper px-2.5 py-2 text-sm text-ink outline-none focus:border-accent"
                     value={block.content}
                     onChange={(e) => updateBlock(i, { ...block, content: e.target.value })}
                   />
@@ -93,12 +93,12 @@ export default function ReviewPage() {
                         className="h-20 w-20 rounded object-cover"
                       />
                     ) : (
-                      <div className="flex h-20 w-20 items-center justify-center rounded bg-neutral-100 text-xs text-neutral-400">
+                      <div className="flex h-20 w-20 items-center justify-center rounded bg-paper text-xs text-ink-faint">
                         {block.file}
                       </div>
                     )}
                     <input
-                      className="flex-1 rounded border border-neutral-200 px-2 py-1.5 text-sm"
+                      className="flex-1 rounded border border-hairline bg-paper px-2.5 py-2 text-sm text-ink outline-none placeholder:text-ink-faint focus:border-accent"
                       placeholder="캡션 (선택)"
                       value={block.caption ?? ""}
                       onChange={(e) => updateBlock(i, { ...block, caption: e.target.value })}
@@ -112,44 +112,45 @@ export default function ReviewPage() {
           <button
             type="button"
             onClick={() => router.push("/progress")}
-            className="self-start rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-neutral-800"
+            className="self-start rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
           >
             임시저장 실행
           </button>
         </div>
 
-        <aside className="flex flex-col gap-4 rounded-md border border-neutral-200 p-4 text-sm">
-          <h2 className="font-semibold">검증</h2>
+        <aside className="flex h-fit flex-col gap-5 rounded border border-hairline bg-surface p-4 text-sm">
+          <h2 className="font-display text-base text-ink">검증</h2>
 
           <div>
-            <p className="mb-1 font-medium text-neutral-600">글자수 (공백 제외)</p>
-            <p className={charCountNoSpace >= minCharRequired ? "text-emerald-600" : "text-red-600"}>
-              {charCountNoSpace}자 / 최소 {minCharRequired}자 (전체 {charCount}자)
+            <p className="mb-1 text-xs font-medium tracking-wide text-ink-faint uppercase">글자수 (공백 제외)</p>
+            <p className={charCountNoSpace >= minCharRequired ? "text-success" : "text-danger"}>
+              {charCountNoSpace}자 / 최소 {minCharRequired}자
+              <span className="text-ink-faint"> · 전체 {charCount}자</span>
             </p>
           </div>
 
           <div>
-            <p className="mb-1 font-medium text-neutral-600">키워드</p>
+            <p className="mb-1 text-xs font-medium tracking-wide text-ink-faint uppercase">키워드</p>
             <ul className="flex flex-col gap-0.5">
               {Object.entries(liveKeywordCounts).map(([kw, count]) => (
-                <li key={kw} className={count > 0 ? "text-emerald-600" : "text-red-600"}>
+                <li key={kw} className={count > 0 ? "text-success" : "text-danger"}>
                   {count > 0 ? "✓" : "✗"} {kw} ({count}회)
                 </li>
               ))}
-              {Object.keys(liveKeywordCounts).length === 0 && <li className="text-neutral-400">키워드 없음</li>}
+              {Object.keys(liveKeywordCounts).length === 0 && <li className="text-ink-faint">키워드 없음</li>}
             </ul>
           </div>
 
           <div>
-            <p className="mb-1 font-medium text-neutral-600">공정위 문구</p>
-            <p className={draft.disclosure.trim() ? "text-emerald-600" : "text-red-600"}>
+            <p className="mb-1 text-xs font-medium tracking-wide text-ink-faint uppercase">공정위 문구</p>
+            <p className={draft.disclosure.trim() ? "text-success" : "text-danger"}>
               {draft.disclosure.trim() ? `✓ ${draft.disclosure}` : "✗ 없음"}
             </p>
           </div>
 
-          <div>
-            <p className="mb-1 font-medium text-neutral-600">업체</p>
-            <p className="text-neutral-500">{input.businessName}</p>
+          <div className="border-t border-hairline pt-4">
+            <p className="mb-1 text-xs font-medium tracking-wide text-ink-faint uppercase">업체</p>
+            <p className="text-ink-soft">{input.businessName}</p>
           </div>
         </aside>
       </main>

@@ -13,7 +13,7 @@ function ElapsedTimer() {
     return () => clearInterval(interval);
   }, []);
 
-  return <p className="text-xs tabular-nums text-neutral-400">경과 시간 {elapsedSec}초</p>;
+  return <p className="font-mono text-xs tabular-nums text-ink-faint">경과 시간 {elapsedSec}초</p>;
 }
 
 export function LoadingOverlay({
@@ -28,16 +28,16 @@ export function LoadingOverlay({
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-white/80 backdrop-blur-sm">
-      <div className="h-10 w-10 animate-spin rounded-full border-4 border-neutral-300 border-t-neutral-900" />
-      <p className="text-base font-medium text-neutral-800">작업중...</p>
-      <p className="text-sm text-neutral-500">{stageText}</p>
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-paper/92 backdrop-blur-sm">
+      <div className="h-9 w-9 animate-spin rounded-full border-2 border-hairline-strong border-t-accent" />
+      <p className="font-display text-base text-ink">작업 중...</p>
+      <p className="text-sm text-ink-soft">{stageText}</p>
       <ElapsedTimer key="elapsed-timer" />
       {onCancel && (
         <button
           type="button"
           onClick={onCancel}
-          className="mt-2 rounded-md border border-neutral-300 px-4 py-1.5 text-sm text-neutral-600 hover:bg-neutral-50"
+          className="mt-2 rounded border border-hairline px-4 py-1.5 text-sm text-ink-soft transition-colors hover:border-hairline-strong hover:text-ink"
         >
           취소
         </button>

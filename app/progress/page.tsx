@@ -83,22 +83,22 @@ export default function ProgressPage() {
         onCancel={() => abortControllerRef.current?.abort()}
       />
 
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-6 py-8">
-        <h1 className="text-xl font-semibold">
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-6 py-10">
+        <h1 className="font-display text-2xl text-ink">
           {status === "uploading" && "임시저장 진행 중"}
-          {status === "done" && "✅ 임시저장 완료"}
-          {status === "error" && "❌ 임시저장 실패"}
+          {status === "done" && "임시저장 완료"}
+          {status === "error" && "임시저장 실패"}
         </h1>
 
-        <div className="flex flex-col gap-1 rounded-md border border-neutral-200 bg-neutral-950 p-4 font-mono text-xs text-neutral-100">
-          {logs.length === 0 && <span className="text-neutral-500">대기 중...</span>}
+        <div className="flex flex-col gap-1 rounded border border-hairline bg-ink p-4 font-mono text-xs text-paper/85">
+          {logs.length === 0 && <span className="text-paper/40">대기 중...</span>}
           {logs.map((line, i) => (
             <span key={i}>{line}</span>
           ))}
         </div>
 
         {status === "error" && (
-          <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="rounded border border-danger/25 bg-danger-soft p-4 text-sm text-danger">
             <p>{errorMessage}</p>
             {screenshotFile && (
               <div className="mt-3">
@@ -106,7 +106,7 @@ export default function ProgressPage() {
                 <img
                   src={`/api/screenshot?file=${encodeURIComponent(screenshotFile)}`}
                   alt="실패 시점 스크린샷"
-                  className="max-w-full rounded border border-red-200"
+                  className="max-w-full rounded border border-danger/25"
                 />
               </div>
             )}
@@ -117,7 +117,7 @@ export default function ProgressPage() {
           <button
             type="button"
             onClick={() => router.push("/done")}
-            className="self-start rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-neutral-800"
+            className="self-start rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
           >
             완료 화면으로
           </button>
@@ -126,7 +126,7 @@ export default function ProgressPage() {
           <button
             type="button"
             onClick={() => router.push("/review")}
-            className="self-start rounded-md border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+            className="self-start rounded border border-hairline px-5 py-2.5 text-sm font-medium text-ink-soft transition-colors hover:border-hairline-strong hover:text-ink"
           >
             검수 화면으로 돌아가기
           </button>
