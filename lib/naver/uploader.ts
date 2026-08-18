@@ -13,7 +13,8 @@ const WRITE_URL = "https://blog.naver.com/GoBlogWrite.naver";
 export class NaverUploadError extends Error {
   constructor(
     message: string,
-    public readonly screenshotPath?: string
+    /** data/error-screenshots/ 안의 파일명 (경로 아님) — /api/screenshot?file= 로 조회 */
+    public readonly screenshotFile?: string
   ) {
     super(message);
     this.name = "NaverUploadError";
@@ -82,9 +83,9 @@ async function typeViaClipboard(page: Page, locator: ReturnType<Page["locator"]>
 
 async function saveScreenshot(page: Page, label: string): Promise<string> {
   await fs.mkdir(SCREENSHOT_DIR, { recursive: true });
-  const file = path.join(SCREENSHOT_DIR, `${label}-${Date.now()}.png`);
-  await page.screenshot({ path: file, fullPage: true }).catch(() => undefined);
-  return file;
+  const fileName = `${label}-${Date.now()}.png`;
+  await page.screenshot({ path: path.join(SCREENSHOT_DIR, fileName), fullPage: true }).catch(() => undefined);
+  return fileName;
 }
 
 export interface UploadDraftOptions {

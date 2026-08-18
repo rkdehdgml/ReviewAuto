@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { AlreadyRunningError, acquireLock, releaseLock } from "../../../lib/lock";
-import { launchNaverContext, uploadDraft } from "../../../lib/naver/uploader";
+import { NaverUploadError, launchNaverContext, uploadDraft } from "../../../lib/naver/uploader";
 import { createNdjsonStream } from "../../../lib/ndjson";
 import { appendHistory, loadPhotoManifest, writeJobStatus } from "../../../lib/store";
 import { draftSchema } from "../../../lib/types";
@@ -72,13 +72,18 @@ export async function POST(request: Request) {
       await writeJobStatus({ stage: "done", message: "임시저장 완료", updatedAt: new Date().toISOString() });
       write({ stage: "done", message: "임시저장 완료" });
     } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
       await writeJobStatus({
         stage: "error",
         message: "임시저장 실패",
         updatedAt: new Date().toISOString(),
-        error: err instanceof Error ? err.message : String(err),
+        error: message,
       });
-      throw err;
+      write({
+        stage: "error",
+        error: message,
+        screenshotFile: err instanceof NaverUploadError ? err.screenshotFile : undefined,
+      });
     } finally {
       await context?.close().catch(() => undefined);
       releaseLock(LOCK_NAME);
