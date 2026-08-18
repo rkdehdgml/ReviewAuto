@@ -45,6 +45,8 @@ export async function launchNaverContext(options?: { headless?: boolean }): Prom
   return chromium.launchPersistentContext(SESSION_DIR, {
     headless: options?.headless ?? false,
     viewport: { width: 1280, height: 900 },
+    // 클립보드 붙여넣기 방식 입력(typeViaClipboard)에 필요
+    permissions: ["clipboard-read", "clipboard-write"],
   });
 }
 
