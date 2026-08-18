@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { StepRail } from "../components/StepRail";
+import { Card } from "../components/Card";
+import { PageShell } from "../components/PageShell";
 import { useSession } from "../providers";
 import { countChars } from "../../lib/validate";
 
@@ -35,50 +36,56 @@ export default function DonePage() {
     router.push("/");
   }
 
+  const rows: [string, string][] = [
+    ["업체", input.businessName],
+    ["제목", draft.title],
+    ["글자수", `${charCountNoSpace}자 (공백 제외)`],
+    ["사진", `${photoFiles.length}장 배치 완료`],
+    ["저장 위치", "네이버 블로그 임시저장함"],
+  ];
+
   return (
-    <div className="flex min-h-screen flex-col">
-      <StepRail current="done" />
-
-      <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-6 py-10">
-        <div className="rounded border border-success/25 bg-success-soft p-4 text-success">
-          <p className="font-display text-base">임시저장에 성공했습니다</p>
-          <p className="mt-1 text-sm text-ink-soft">네이버에서 임시저장 글을 열어 최종 확인 후 직접 발행해주세요.</p>
+    <PageShell current="done" maxWidth="max-w-2xl">
+      <div className="flex flex-col gap-4">
+        <div className="rounded-xl border border-accent/25 bg-accent-soft p-8 text-center">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent text-2xl text-white">
+            ✓
+          </div>
+          <div className="font-semibold text-accent-dark">임시저장이 완료되었습니다</div>
+          <div className="mt-1.5 text-sm text-muted">
+            네이버 블로그 → 임시저장 글에서 최종 확인 후 직접 발행해 주세요.
+          </div>
         </div>
 
-        <div className="rounded border border-hairline bg-surface p-4 text-sm">
-          <h2 className="mb-3 font-display text-base text-ink">이번 리뷰 요약</h2>
-          <dl className="grid grid-cols-[100px_1fr] gap-y-2.5">
-            <dt className="text-ink-faint">업체</dt>
-            <dd className="text-ink">{input.businessName}</dd>
-            <dt className="text-ink-faint">제목</dt>
-            <dd className="text-ink">{draft.title}</dd>
-            <dt className="text-ink-faint">글자수</dt>
-            <dd className="text-ink">{charCountNoSpace}자 (공백 제외)</dd>
-            <dt className="text-ink-faint">사진 수</dt>
-            <dd className="text-ink">{photoFiles.length}장</dd>
-            <dt className="text-ink-faint">저장 위치</dt>
-            <dd className="text-ink">네이버 블로그 임시저장함</dd>
-          </dl>
-        </div>
+        <Card title="이번 리뷰 요약">
+          <ul className="flex flex-col gap-2 text-sm">
+            {rows.map(([k, v]) => (
+              <li key={k} className="flex justify-between gap-4 border-b border-soft py-1.5 last:border-0">
+                <span className="shrink-0 text-muted">{k}</span>
+                <span className="text-right text-ink">{v}</span>
+              </li>
+            ))}
+          </ul>
+        </Card>
 
-        <div className="flex gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <a
             href={blogUrl}
             target="_blank"
             rel="noreferrer"
-            className="rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+            className="rounded-xl border border-line py-3 text-center text-sm font-medium text-ink transition hover:bg-surface"
           >
             네이버 임시저장함 열기
           </a>
           <button
             type="button"
             onClick={handleNewReview}
-            className="rounded border border-hairline px-5 py-2.5 text-sm font-medium text-ink-soft transition-colors hover:border-hairline-strong hover:text-ink"
+            className="rounded-xl bg-ink py-3 text-sm font-semibold text-white transition hover:opacity-90"
           >
             새 리뷰 작성
           </button>
         </div>
-      </main>
-    </div>
+      </div>
+    </PageShell>
   );
 }

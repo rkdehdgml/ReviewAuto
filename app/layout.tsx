@@ -31,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="ko"
       className={`${geistSans.variable} ${geistMono.variable} ${gowunBatang.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-paper font-sans text-ink">
+      <body className="min-h-full flex flex-col bg-page font-sans text-ink">
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -1,24 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 
+import { Badge } from "../components/Badge";
+import { Card } from "../components/Card";
 import { LoadingOverlay } from "../components/LoadingOverlay";
+import { PageShell } from "../components/PageShell";
 import type { EnvStatus, StyleProfile } from "../../lib/types";
 
 const STALE_DAYS = 90;
 
 function daysSince(iso: string): number {
   return Math.floor((Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24));
-}
-
-function StatusRow({ ok, label }: { ok: boolean; label: string }) {
-  return (
-    <li className={`flex items-center gap-2 ${ok ? "text-success" : "text-ink-faint"}`}>
-      <span>{ok ? "✓" : "✗"}</span>
-      <span>{label}</span>
-    </li>
-  );
 }
 
 export default function SettingsPage() {
@@ -75,80 +68,73 @@ export default function SettingsPage() {
 
   const isStale = profile ? daysSince(profile.analyzedAt) > STALE_DAYS : false;
 
+  const envRows = status
+    ? [
+        { name: "Claude Code 로그인", detail: status.claudeCliInstalled ? "Pro 구독 인증 확인됨" : "claude CLI 미설치", ok: status.claudeCliInstalled && status.claudeCliLoggedIn },
+        { name: "네이버 세션", detail: status.naverSessionExists ? "저장된 세션 유효" : "npm run login 필요", ok: status.naverSessionExists },
+        { name: "지역검색 API 키", detail: status.naverSearchApiConfigured ? ".env 설정 확인됨" : "미설정 — 없어도 진행 가능", ok: status.naverSearchApiConfigured },
+        {
+          name: "ANTHROPIC_API_KEY",
+          detail: status.anthropicApiKeyWarning ? "설정됨 — 구독 대신 API 과금 발생" : "환경 변수 없음 (정상 — 구독 과금 방지)",
+          ok: !status.anthropicApiKeyWarning,
+        },
+      ]
+    : [];
+  const allOk = envRows.every((r) => r.ok);
+
   return (
-    <div className="flex min-h-screen flex-col">
+    <PageShell>
       <LoadingOverlay visible={analyzing} stageText="문체 분석 중..." />
 
-      <header className="flex items-center justify-between border-b border-hairline bg-surface px-6 py-3.5">
-        <h1 className="font-display text-[15px] text-ink">설정</h1>
-        <Link href="/" className="text-[13px] text-ink-soft underline decoration-hairline-strong hover:text-ink">
-          ← 입력 화면으로
-        </Link>
-      </header>
-
-      <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-9 px-6 py-10">
-        <section className="flex flex-col gap-3">
-          <h2 className="font-display text-base text-ink">환경 체크</h2>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card title="환경 체크" right={status && <Badge tone={allOk ? "ok" : "warn"}>{allOk ? "모두 정상" : "확인 필요"}</Badge>}>
           {status ? (
-            <>
-              <ul className="flex flex-col gap-1 text-sm">
-                <StatusRow ok={status.claudeCliInstalled} label="Claude Code CLI 설치됨" />
-                <StatusRow ok={status.claudeCliLoggedIn} label="Claude Code 로그인됨" />
-                <StatusRow ok={status.naverSessionExists} label="네이버 로그인 세션 (npm run login)" />
-                <StatusRow ok={status.naverSearchApiConfigured} label="네이버 지역 검색 API 키 (.env)" />
-              </ul>
-              {status.anthropicApiKeyWarning && (
-                <p className="rounded border border-warning/25 bg-warning-soft px-3 py-2 text-xs text-warning">
-                  ⚠ ANTHROPIC_API_KEY 환경 변수가 설정되어 있습니다. claude -p가 Pro 구독 대신 API 과금으로
-                  동작합니다.
-                </p>
-              )}
-              {!status.naverSessionExists && (
-                <p className="text-xs text-ink-faint">
-                  터미널에서 <code className="rounded bg-paper px-1">npm run login</code>을 실행해 네이버에
-                  로그인해주세요.
-                </p>
-              )}
-              {!status.naverSearchApiConfigured && (
-                <p className="text-xs text-ink-faint">
-                  .env.example을 .env로 복사하고 NAVER_CLIENT_ID / NAVER_CLIENT_SECRET을 채워주세요. (없어도 가게
-                  정보 없이 진행할 수 있습니다)
-                </p>
-              )}
-            </>
+            <ul className="flex flex-col gap-2.5 text-sm">
+              {envRows.map((r) => (
+                <li key={r.name} className="flex items-center justify-between gap-3 border-b border-soft py-1.5 last:border-0">
+                  <div>
+                    <div className="text-ink">{r.name}</div>
+                    <div className="text-xs text-muted">{r.detail}</div>
+                  </div>
+                  <Badge tone={r.ok ? "ok" : "warn"}>{r.ok ? "정상" : "확인 필요"}</Badge>
+                </li>
+              ))}
+            </ul>
           ) : (
-            <p className="text-sm text-ink-faint">확인 중...</p>
+            <p className="text-sm text-muted">확인 중...</p>
           )}
-        </section>
+        </Card>
 
-        <section className="flex flex-col gap-3">
-          <h2 className="font-display text-base text-ink">문체 프로필</h2>
-
-          <div className="rounded border border-hairline bg-surface p-4 text-sm">
-            {profile ? (
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-ink">분석 완료</span>
-                  {isStale && (
-                    <span className="rounded-full bg-warning-soft px-2 py-0.5 text-xs text-warning">갱신 권장</span>
-                  )}
-                </div>
-                <p className="text-xs text-ink-faint">
-                  분석 일시: {new Date(profile.analyzedAt).toLocaleString()} · 글 {profile.sourcePostCount}개 분석
-                </p>
-                <p className="mt-2 text-ink-soft">{profile.profile.tone}</p>
+        <Card title="문체 프로필" right={profile && <Badge tone={isStale ? "warn" : "ok"}>{isStale ? "갱신 권장" : "최신"}</Badge>}>
+          {profile ? (
+            <div className="flex flex-col gap-1.5 text-sm text-ink">
+              <div className="flex justify-between">
+                <span className="text-muted">블로그</span>
+                <span className="truncate">{profile.blogUrl.replace(/^https?:\/\//, "")}</span>
               </div>
-            ) : (
-              <p className="text-ink-faint">아직 분석 전입니다.</p>
-            )}
-          </div>
+              <div className="flex justify-between">
+                <span className="text-muted">분석 일시</span>
+                <span>{new Date(profile.analyzedAt).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted">분석 글 수</span>
+                <span>{profile.sourcePostCount}개</span>
+              </div>
+              <div className="mt-3 rounded-lg bg-soft p-3 text-sm leading-relaxed text-ink">
+                <span className="mb-1 block text-xs font-semibold text-accent-dark">문체 요약</span>
+                {profile.profile.tone}
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-muted">아직 분석 전입니다.</p>
+          )}
 
-          {error && <p className="text-sm text-danger">{error}</p>}
+          {error && <p className="mt-3 text-sm text-danger">{error}</p>}
 
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-ink-soft">네이버 블로그 주소</span>
+          <label className="mt-4 flex flex-col gap-1.5 text-sm">
+            <span className="font-medium text-muted">네이버 블로그 주소</span>
             <input
-              className="rounded border border-hairline bg-surface px-3 py-2 text-ink outline-none placeholder:text-ink-faint focus:border-accent"
+              className="rounded-lg border border-line px-3 py-2 text-ink outline-none focus:ring-2 focus:ring-accent-soft"
               placeholder="https://blog.naver.com/내아이디"
               value={blogUrl}
               onChange={(e) => setBlogUrl(e.target.value)}
@@ -159,12 +145,15 @@ export default function SettingsPage() {
             type="button"
             onClick={handleAnalyze}
             disabled={analyzing}
-            className="self-start rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
+            className="mt-4 w-full rounded-lg bg-accent py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
           >
             {profile ? "프로필 갱신" : "프로필 생성"}
           </button>
-        </section>
-      </main>
-    </div>
+          <p className="mt-2 text-xs text-muted">
+            RSS에서 최근 글을 다시 수집해 문체를 재분석합니다. 실패 시 기존 프로필이 유지됩니다.
+          </p>
+        </Card>
+      </div>
+    </PageShell>
   );
 }

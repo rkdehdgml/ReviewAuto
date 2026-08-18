@@ -1,30 +1,30 @@
 @import "tailwindcss";
 
 /*
- * 디자인 토큰. 이 앱은 개인용 로컬 도구라 시스템 다크모드는 따르지 않고
- * 하나의 톤(종이 위 잉크)으로 고정한다 — 이전에 body{}가 언레이어드 CSS로
- * Tailwind 유틸리티(bg-neutral-50 등)를 항상 덮어써 다크모드에서 화면이
- * 반쪽만 검게 보이던 버그의 근본 원인이었다.
+ * 디자인 토큰. 개인용 로컬 도구라 시스템 다크모드는 따르지 않고
+ * 하나의 톤으로 고정한다 (이전에 언레이어드 body{} CSS가 Tailwind 유틸리티를
+ * 항상 덮어써 다크모드에서 화면이 반쪽만 검게 보이던 버그의 원인이었다 — 지금은
+ * body 배경/텍스트를 Tailwind 유틸리티 하나로만 지정해 그 충돌 자체가 없다).
  */
 @theme {
-  --color-paper: #faf9f6;
+  --color-page: #f6f7f3;
   --color-surface: #ffffff;
-  --color-ink: #1c1a17;
-  --color-ink-soft: #4a453e;
-  --color-ink-faint: #918b7f;
-  --color-hairline: #e6e2d9;
-  --color-hairline-strong: #d3cdc0;
-  --color-accent: #24344a;
-  --color-accent-hover: #182636;
-  --color-accent-soft: #eef1f5;
-  --color-success: #3f6b4f;
-  --color-success-soft: #eaf2ec;
-  --color-danger: #a3402e;
-  --color-danger-soft: #fbeeea;
-  --color-warning: #93691f;
-  --color-warning-soft: #faf1de;
+  --color-ink: #1b211c;
+  --color-muted: #6c746c;
+  --color-line: #e2e6df;
+  --color-soft: #eff3ec;
 
-  --font-display: var(--font-gowun), serif;
+  --color-accent: #03aa4f;
+  --color-accent-dark: #028a41;
+  --color-accent-soft: #f0faf3;
+
+  --color-warn: #c77d1e;
+  --color-warn-soft: #fbf0de;
+  --color-danger: #c2453a;
+  --color-danger-soft: #f9e7e5;
+  --color-ok-soft: #e4f5ea;
+
+  --font-display: Georgia, var(--font-gowun), "Apple SD Gothic Neo", serif;
   --font-sans: var(--font-geist-sans), "Apple SD Gothic Neo", sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
 }

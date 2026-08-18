@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { Badge } from "../components/Badge";
+import { Card } from "../components/Card";
 import { LoadingOverlay } from "../components/LoadingOverlay";
-import { StepRail } from "../components/StepRail";
+import { PageShell } from "../components/PageShell";
 import { streamNdjson } from "../lib/stream-ndjson";
 import { useSession } from "../providers";
 
@@ -21,6 +23,7 @@ export default function ProgressPage() {
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const startedRef = useRef(false);
+  const logBoxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!generateResult) {
@@ -72,33 +75,42 @@ export default function ProgressPage() {
     });
   }, [generateResult, input.businessName, router, setUploadResult]);
 
+  useEffect(() => {
+    logBoxRef.current?.scrollTo(0, logBoxRef.current.scrollHeight);
+  }, [logs]);
+
   if (!generateResult) return null;
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <StepRail current="progress" />
+    <PageShell current="progress" maxWidth="max-w-2xl">
       <LoadingOverlay
         visible={status === "uploading"}
         stageText={logs[logs.length - 1] ?? "네이버 블로그에 임시저장하는 중..."}
         onCancel={() => abortControllerRef.current?.abort()}
       />
 
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-6 py-10">
-        <h1 className="font-display text-2xl text-ink">
-          {status === "uploading" && "임시저장 진행 중"}
-          {status === "done" && "임시저장 완료"}
-          {status === "error" && "임시저장 실패"}
-        </h1>
-
-        <div className="flex flex-col gap-1 rounded border border-hairline bg-ink p-4 font-mono text-xs text-paper/85">
-          {logs.length === 0 && <span className="text-paper/40">대기 중...</span>}
-          {logs.map((line, i) => (
-            <span key={i}>{line}</span>
-          ))}
-        </div>
+      <div className="flex flex-col gap-4">
+        <Card
+          title="임시저장 진행 로그"
+          right={
+            <Badge tone={status === "done" ? "ok" : status === "error" ? "danger" : "warn"}>
+              {status === "done" ? "완료" : status === "error" ? "실패" : "진행 중"}
+            </Badge>
+          }
+        >
+          <div ref={logBoxRef} className="h-64 overflow-y-auto rounded-lg bg-ink p-4 font-mono text-xs leading-6 text-[#c8e6cf]">
+            {logs.map((line, i) => (
+              <div key={i} className={line.startsWith("오류") ? "text-[#f0a89e]" : undefined}>
+                <span className="text-[#5a7060]">{String(i + 1).padStart(2, "0")} </span>
+                {line}
+              </div>
+            ))}
+            {status === "uploading" && <div className="animate-pulse">▌</div>}
+          </div>
+        </Card>
 
         {status === "error" && (
-          <div className="rounded border border-danger/25 bg-danger-soft p-4 text-sm text-danger">
+          <div className="rounded-lg border border-danger/25 bg-danger-soft p-4 text-sm text-danger">
             <p>{errorMessage}</p>
             {screenshotFile && (
               <div className="mt-3">
@@ -106,7 +118,7 @@ export default function ProgressPage() {
                 <img
                   src={`/api/screenshot?file=${encodeURIComponent(screenshotFile)}`}
                   alt="실패 시점 스크린샷"
-                  className="max-w-full rounded border border-danger/25"
+                  className="max-w-full rounded-lg border border-danger/25"
                 />
               </div>
             )}
@@ -117,7 +129,7 @@ export default function ProgressPage() {
           <button
             type="button"
             onClick={() => router.push("/done")}
-            className="self-start rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+            className="w-full rounded-xl bg-accent py-3 text-sm font-semibold text-white transition hover:opacity-90"
           >
             완료 화면으로
           </button>
@@ -126,12 +138,12 @@ export default function ProgressPage() {
           <button
             type="button"
             onClick={() => router.push("/review")}
-            className="self-start rounded border border-hairline px-5 py-2.5 text-sm font-medium text-ink-soft transition-colors hover:border-hairline-strong hover:text-ink"
+            className="w-full rounded-xl border border-line py-3 text-sm font-medium text-ink transition hover:bg-page"
           >
             검수 화면으로 돌아가기
           </button>
         )}
-      </main>
-    </div>
+      </div>
+    </PageShell>
   );
 }
