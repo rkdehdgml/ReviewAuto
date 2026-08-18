@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { LoadingOverlay } from "./components/LoadingOverlay";
 import { StepRail } from "./components/StepRail";
+import { getObjectUrl } from "./lib/object-url";
 import { streamNdjson } from "./lib/stream-ndjson";
 import { type PhotoInput, useSession } from "./providers";
 import type { PlaceResult } from "../lib/types";
@@ -270,7 +271,7 @@ export default function InputPage() {
                 <li key={`${p.file.name}-${i}`} className="flex items-center gap-3 rounded-md border border-neutral-200 p-2">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={URL.createObjectURL(p.file)}
+                    src={getObjectUrl(p.file)}
                     alt={p.file.name}
                     className="h-14 w-14 rounded object-cover"
                   />

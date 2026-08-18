@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 import { StepRail } from "../components/StepRail";
+import { getObjectUrl } from "../lib/object-url";
 import { useSession } from "../providers";
 import type { Draft, DraftBlock } from "../../lib/types";
 import { countChars, countKeywords } from "../../lib/validate";
@@ -87,7 +88,7 @@ export default function ReviewPage() {
                     {photoByName.has(block.file) ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={URL.createObjectURL(photoByName.get(block.file)!)}
+                        src={getObjectUrl(photoByName.get(block.file)!)}
                         alt={block.file}
                         className="h-20 w-20 rounded object-cover"
                       />
