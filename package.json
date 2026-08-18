@@ -1,0 +1,36 @@
+{
+  "name": "review-auto",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "login": "tsx scripts/login.ts",
+    "poc:naver-draft": "tsx scripts/poc-naver-draft.ts",
+    "postinstall": "playwright install chromium"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
+    "next": "16.3.1",
+    "playwright": "^1.49.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "rss-parser": "^3.13.0",
+    "sharp": "^0.33.5",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.1",
+    "tailwindcss": "^4",
+    "tsx": "^4.19.2",
+    "typescript": "^5"
+  }
+}
